@@ -3,35 +3,44 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The Hopper's Hut - Customer Signup</title>
+  <title>The Hopper's Hut - Signup</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      max-width: 480px;
+      margin: 2rem auto;
       background: #f9f9f9;
-      padding: 2rem;
-      max-width: 500px;
-      margin: auto;
+      padding: 1.5rem;
+      border-radius: 8px;
     }
     h1 {
       text-align: center;
     }
     form {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     label {
       margin-top: 1rem;
       font-weight: bold;
     }
-    input {
-      padding: 0.5rem;
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
       margin-top: 0.5rem;
+      padding: 0.5rem;
       border: 1px solid #ccc;
       border-radius: 4px;
+      font-size: 1rem;
+    }
+    .checkbox-label {
+      font-weight: normal;
+      margin-top: 1rem;
+      font-size: 0.9rem;
     }
     button {
       margin-top: 2rem;
@@ -40,26 +49,31 @@
       color: white;
       border: none;
       border-radius: 4px;
+      font-size: 1.1rem;
       cursor: pointer;
     }
     button:hover {
       background: #444;
     }
-    .message {
+    #success-message {
       margin-top: 1rem;
-      font-weight: bold;
       text-align: center;
+      font-weight: bold;
     }
-    .error {
+    #success-message.success {
+      color: green;
+    }
+    #success-message.error {
       color: red;
     }
-    .success {
-      color: green;
+    a {
+      color: #06c;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <h1>Sign up for updates & get a free drink on your birthday!</h1>
+  <h1>Join The Hopper's Hut List</h1>
   <form id="signup-form">
     <label for="name">First Name:</label>
     <input type="text" id="name" name="name" required />
@@ -71,76 +85,59 @@
     <input type="tel" id="phone" name="phone" />
 
     <label for="birthday">Birthday (Day & Month Only):</label>
-    <input
-      type="text"
-      id="birthday"
-      name="birthday"
-      placeholder="e.g. 14 March"
-      pattern="^(0?[1-9]|[12][0-9]|3[01])\s[a-zA-Z]+$"
-      required
-    />
+    <input type="text" id="birthday" name="birthday" placeholder="e.g. 14 March" pattern="^(0?[1-9]|[12][0-9]|3[01])\s[a-zA-Z]+$" required />
 
-    <label>
+    <label class="checkbox-label">
       <input type="checkbox" name="consent" required />
-      I agree to receive marketing emails and messages from The Hopper’s Hut, including a free birthday drink offer. Over 18s only.
-      <a href="https://www.hoppershut.com/privacy-policy-2/" target="_blank" rel="noopener">Click here</a> for full terms and conditions.
+      I agree to receive marketing emails and messages from The Hopper’s Hut, including a free birthday drink offer. Over 18s only. 
+      <a href="https://www.hoppershut.com/privacy-policy-2/" target="_blank" rel="noopener noreferrer">Click here for full terms and conditions.</a>
     </label>
 
-    <button type="submit" id="submit-btn">Submit</button>
-    <div class="message" id="form-message"></div>
+    <button type="submit">Submit</button>
+    <div id="success-message"></div>
   </form>
 
   <script>
     const form = document.getElementById('signup-form');
-    const messageDiv = document.getElementById('form-message');
-    const submitBtn = document.getElementById('submit-btn');
+    const successMessage = document.getElementById('success-message');
 
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec';
 
-    form.addEventListener('submit', async e => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting...';
-      messageDiv.textContent = '';
-      messageDiv.className = 'message';
+      successMessage.textContent = '';
+      successMessage.className = '';
+
+      const data = new FormData(form);
+      const formData = Object.fromEntries(data.entries());
 
       try {
         const response = await fetch(scriptURL, {
           method: 'POST',
-          body: new URLSearchParams(new FormData(form))
+          body: new URLSearchParams(formData)
         });
 
         const text = await response.text();
-        console.log('Raw response text:', text);
 
-        let data;
+        let json;
         try {
-          data = JSON.parse(text);
-          console.log('Parsed JSON:', data);
-        } catch (parseError) {
-          console.error('JSON parse error:', parseError);
-          messageDiv.textContent = 'Unexpected server response. Please try again later.';
-          messageDiv.classList.add('error');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Submit';
-          return;
+          json = JSON.parse(text);
+        } catch (err) {
+          throw new Error('Invalid server response: ' + text);
         }
 
-        if (data.status === 'success') {
-          messageDiv.textContent = data.message;
-          messageDiv.classList.add('success');
+        if (json.status === 'success') {
           form.reset();
+          successMessage.textContent = json.message;
+          successMessage.className = 'success';
         } else {
-          messageDiv.textContent = data.message || 'There was an error. Please try again later.';
-          messageDiv.classList.add('error');
+          successMessage.textContent = json.message || 'There was an error. Please try again later.';
+          successMessage.className = 'error';
         }
+
       } catch (error) {
-        console.error('Fetch error:', error);
-        messageDiv.textContent = 'There was an error. Please try again later.';
-        messageDiv.classList.add('error');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit';
+        successMessage.textContent = 'Error: ' + error.message;
+        successMessage.className = 'error';
       }
     });
   </script>
