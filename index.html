@@ -89,39 +89,41 @@
   </form>
 
   <script>
-    const form = document.getElementById('signup-form');
-    const message = document.getElementById('form-message');
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec';
+  const form = document.getElementById('signup-form');
+const successMessage = document.getElementById('success-message');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      message.textContent = '';
-      message.className = 'message';
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-      const formData = new FormData(form);
+  const data = new FormData(form);
+  const formData = Object.fromEntries(data.entries());
 
-      try {
-        const response = await fetch(scriptURL, {
-          method: 'POST',
-          body: new URLSearchParams(formData)
-        });
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec';
 
-        const result = await response.json();
-
-        if (result.status === 'success') {
-          message.textContent = result.message;
-          message.classList.add('success');
-          form.reset();
-        } else {
-          message.textContent = result.message;
-          message.classList.add('error');
-        }
-
-      } catch (error) {
-        message.textContent = 'There was an error. Please try again later.';
-        message.classList.add('error');
-      }
+  try {
+    const response = await fetch(scriptURL, {
+      method: 'POST',
+      body: new URLSearchParams(formData)
     });
+
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      form.reset();
+      successMessage.textContent = result.message;
+      successMessage.style.color = 'green';
+    } else {
+      successMessage.textContent = result.message || 'There was an error. Please try again later.';
+      successMessage.style.color = 'red';
+    }
+
+  } catch (error) {
+    successMessage.textContent = 'There was an error. Please try again later.';
+    successMessage.style.color = 'red';
+    console.error('Error submitting form:', error);
+  }
+});
+
   </script>
 </body>
 </html>
