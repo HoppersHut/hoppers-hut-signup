@@ -95,7 +95,6 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // collect data
     const data = new FormData(form);
     data.set('music', form.querySelector('input[name="music"]').checked ? "Yes" : "No");
     data.set('vinyl_night', form.querySelector('input[name="vinyl_night"]').checked ? "Yes" : "No");
@@ -120,6 +119,9 @@
         form.reset();
         successMessage.style.color = 'green';
         successMessage.textContent = 'Thanks for signing up!';
+      } else if(text.startsWith('ERROR')) {
+        successMessage.style.color = 'red';
+        successMessage.textContent = text;
       } else {
         successMessage.style.color = 'red';
         successMessage.textContent = 'There was an unexpected response. Please try again later.';
@@ -130,6 +132,5 @@
     }
   });
 </script>
-
 </body>
 </html>
