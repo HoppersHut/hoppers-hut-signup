@@ -103,15 +103,26 @@
 
       const formData = Object.fromEntries(data.entries());
 
-https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec      try {
-        await fetch(scriptURL, {
+https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec            try {
+        const response = await fetch(scriptURL, {
           method: 'POST',
           body: new URLSearchParams(formData)
         });
-        form.reset();
-        successMessage.textContent = 'Thanks for signing up!';
+        const result = await response.text();
+
+        if (result.trim() === "DUPLICATE") {
+          successMessage.textContent = 'You have already signed up.';
+        } else if (result.trim() === "SUCCESS") {
+          form.reset();
+          successMessage.textContent = 'Thanks for signing up!';
+        } else {
+          successMessage.textContent = 'There was an unexpected response. Please try again later.';
+        }
       } catch (error) {
         successMessage.textContent = 'There was an error. Please try again later.';
+        console.error(error);
+      }
+
       }
     });
   </script>
