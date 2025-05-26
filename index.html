@@ -7,40 +7,31 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 480px;
-      margin: 2rem auto;
       background: #f9f9f9;
-      padding: 1.5rem;
-      border-radius: 8px;
+      padding: 2rem;
+      max-width: 500px;
+      margin: auto;
     }
     h1 {
       text-align: center;
     }
     form {
-      background: #fff;
-      padding: 1.5rem;
-      border-radius: 6px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     label {
       margin-top: 1rem;
       font-weight: bold;
     }
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"] {
-      margin-top: 0.5rem;
+    input, select {
       padding: 0.5rem;
+      margin-top: 0.5rem;
       border: 1px solid #ccc;
       border-radius: 4px;
-      font-size: 1rem;
-    }
-    .checkbox-label {
-      font-weight: normal;
-      margin-top: 1rem;
-      font-size: 0.9rem;
     }
     button {
       margin-top: 2rem;
@@ -49,26 +40,20 @@
       color: white;
       border: none;
       border-radius: 4px;
-      font-size: 1.1rem;
       cursor: pointer;
     }
     button:hover {
       background: #444;
     }
-    #success-message {
-      margin-top: 1rem;
-      text-align: center;
-      font-weight: bold;
-    }
-    #success-message.success {
+    .success {
       color: green;
+      text-align: center;
+      margin-top: 1rem;
     }
-    #success-message.error {
+    .error {
       color: red;
-    }
-    a {
-      color: #06c;
-      text-decoration: none;
+      text-align: center;
+      margin-top: 1rem;
     }
   </style>
 </head>
@@ -87,57 +72,54 @@
     <label for="birthday">Birthday (Day & Month Only):</label>
     <input type="text" id="birthday" name="birthday" placeholder="e.g. 14 March" pattern="^(0?[1-9]|[12][0-9]|3[01])\s[a-zA-Z]+$" required />
 
-    <label class="checkbox-label">
+    <label>
       <input type="checkbox" name="consent" required />
       I agree to receive marketing emails and messages from The Hopper’s Hut, including a free birthday drink offer. Over 18s only. 
-      <a href="https://www.hoppershut.com/privacy-policy-2/" target="_blank" rel="noopener noreferrer">Click here for full terms and conditions.</a>
+      <a href="https://www.hoppershut.com/privacy-policy-2/" target="_blank" rel="noopener">Click here</a> for full terms and conditions.
     </label>
 
+    <div style="font-size: 0.9em; margin-top: 0.5em;">
+      <a href="https://www.hoppershut.com/privacy-policy-2/" target="_blank" rel="noopener">Privacy Policy & GDPR info</a>.<br />
+      To update or remove your data, email <a href="mailto:hello@hoppershut.co.uk">hello@hoppershut.co.uk</a>.
+    </div>
+
     <button type="submit">Submit</button>
-    <div id="success-message"></div>
+    <div id="message" class="success"></div>
   </form>
 
   <script>
     const form = document.getElementById('signup-form');
-    const successMessage = document.getElementById('success-message');
-
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec';
+    const messageDiv = document.getElementById('message');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      successMessage.textContent = '';
-      successMessage.className = '';
+      messageDiv.textContent = '';
+      messageDiv.className = '';
 
       const data = new FormData(form);
       const formData = Object.fromEntries(data.entries());
 
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec';
+
       try {
         const response = await fetch(scriptURL, {
           method: 'POST',
-          body: new URLSearchParams(formData)
+          body: new URLSearchParams(formData),
         });
 
-        const text = await response.text();
+        const result = await response.json();
 
-        let json;
-        try {
-          json = JSON.parse(text);
-        } catch (err) {
-          throw new Error('Invalid server response: ' + text);
-        }
-
-        if (json.status === 'success') {
+        if (result.status === 'success') {
+          messageDiv.textContent = result.message;
+          messageDiv.className = 'success';
           form.reset();
-          successMessage.textContent = json.message;
-          successMessage.className = 'success';
         } else {
-          successMessage.textContent = json.message || 'There was an error. Please try again later.';
-          successMessage.className = 'error';
+          messageDiv.textContent = result.message || 'There was an error. Please try again later.';
+          messageDiv.className = 'error';
         }
-
       } catch (error) {
-        successMessage.textContent = 'Error: ' + error.message;
-        successMessage.className = 'error';
+        messageDiv.textContent = 'There was an error. Please try again later.';
+        messageDiv.className = 'error';
       }
     });
   </script>
