@@ -105,8 +105,7 @@ data.set('new_beer_alerts', form.querySelector('input[name="new_beer_alerts"]').
 
       const formData = Object.fromEntries(data.entries());
 
-const scriptURL = 'https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec';
-      try {
+https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec      try {
         await fetch(scriptURL, {
           method: 'POST',
           body: new URLSearchParams(formData)
