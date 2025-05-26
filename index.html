@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Hopper's Hut - Customer Signup</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 2rem;
+      max-width: 500px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input, select {
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      margin-top: 2rem;
+      padding: 0.75rem;
+      background: #222;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #444;
+    }
+    .success {
+      color: green;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Join The Hopper's Hut List</h1>
+  <form id="signup-form">
+    <label for="name">First Name:</label>
+    <input type="text" id="name" name="name" required />
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required />
+
+    <label for="phone">Phone Number:</label>
+    <input type="tel" id="phone" name="phone" />
+
+    <label for="birthday">Birthday (Day & Month Only):</label>
+    <input type="text" id="birthday" name="birthday" placeholder="e.g. 14 March" pattern="^(0?[1-9]|[12][0-9]|3[01])\s[a-zA-Z]+$" required />
+
+    <label>Marketing Preferences (tick all that apply):</label>
+    <label><input type="checkbox" name="preferences" value="Events" /> Events</label>
+    <label><input type="checkbox" name="preferences" value="New Beer Alerts" /> New Beer Alerts</label>
+    <label><input type="checkbox" name="preferences" value="Drinks Promotions" /> Drinks Promotions</label>
+
+    <label>
+      <input type="checkbox" name="consent" required />
+      I agree to receive marketing communications from The Hopper’s Hut. I understand this includes enrolment in the 'Free Birthday Drink' offer. Over 18s only, subject to terms and conditions. Offers include a pint of lager, cask beer, cider, glass of wine or soft drink. All in line with UK licensing laws and responsible drinking policies.
+    </label>
+
+    <button type="submit">Submit</button>
+    <div class="success" id="success-message"></div>
+  </form>
+
+  <script>
+    const form = document.getElementById('signup-form');
+    const successMessage = document.getElementById('success-message');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = new FormData(form);
+      const preferences = [...form.querySelectorAll('input[name="preferences"]:checked')].map(cb => cb.value).join(", ");
+      data.set('preferences', preferences);
+      const formData = Object.fromEntries(data.entries());
+
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbxXxXxXxXxXxXxXxXxXxXx/exec';
+
+
+      try {
+        await fetch(scriptURL, {
+          method: 'POST',
+          body: new URLSearchParams(formData)
+        });
+        form.reset();
+        successMessage.textContent = 'Thanks for signing up!';
+      } catch (error) {
+        successMessage.textContent = 'There was an error. Please try again later.';
+      }
+    });
+  </script>
+</body>
+</html>
