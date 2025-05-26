@@ -68,11 +68,12 @@
     <input type="text" id="birthday" name="birthday" placeholder="e.g. 14 March" pattern="^(0?[1-9]|[12][0-9]|3[01])\s[a-zA-Z]+$" required />
 
    <label>I wish to receive updates & news from The Hopper's Hut and also a free drink on my birthday:</label>
-    <label><input type="checkbox" name="preferences" value="Music" /> Music</label>
-    <label><input type="checkbox" name="preferences" value="Vinyl Night" /> Vinyl Night</label>
-    <label><input type="checkbox" name="preferences" value="Quiz" /> Quiz</label>
-    <label><input type="checkbox" name="preferences" value="Drinks Promotions" /> Drinks Promotions</label>
-    <label><input type="checkbox" name="preferences" value="New Beer Alerts" /> New Beer Alerts</label>
+    <label><input type="checkbox" name="music" /> Music</label>
+<label><input type="checkbox" name="vinyl_night" /> Vinyl Night</label>
+<label><input type="checkbox" name="quiz" /> Quiz</label>
+<label><input type="checkbox" name="drinks_promotions" /> Drinks Promotions</label>
+<label><input type="checkbox" name="new_beer_alerts" /> New Beer Alerts</label>
+
 
      <label>
   <input type="checkbox" name="consent" required />
@@ -96,8 +97,12 @@
       e.preventDefault();
 
       const data = new FormData(form);
-      const preferences = [...form.querySelectorAll('input[name="preferences"]:checked')].map(cb => cb.value).join(", ");
-      data.set('preferences', preferences);
+      data.set('music', form.querySelector('input[name="music"]').checked ? "Yes" : "No");
+data.set('vinyl_night', form.querySelector('input[name="vinyl_night"]').checked ? "Yes" : "No");
+data.set('quiz', form.querySelector('input[name="quiz"]').checked ? "Yes" : "No");
+data.set('drinks_promotions', form.querySelector('input[name="drinks_promotions"]').checked ? "Yes" : "No");
+data.set('new_beer_alerts', form.querySelector('input[name="new_beer_alerts"]').checked ? "Yes" : "No");
+
       const formData = Object.fromEntries(data.entries());
 
 const scriptURL = 'https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec';
