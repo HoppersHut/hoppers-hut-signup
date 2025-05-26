@@ -87,33 +87,49 @@
     <div class="success" id="success-message"></div>
   </form>
 
-  <script>
-    const form = document.getElementById('signup-form');
-    const successMessage = document.getElementById('success-message');
+ <script>
+  const form = document.getElementById('signup-form');
+  const successMessage = document.getElementById('success-message');
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec';
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      const data = new FormData(form);
-      data.set('music', form.querySelector('input[name="music"]').checked ? "Yes" : "No");
-      data.set('vinyl_night', form.querySelector('input[name="vinyl_night"]').checked ? "Yes" : "No");
-      data.set('quiz', form.querySelector('input[name="quiz"]').checked ? "Yes" : "No");
-      data.set('drinks_promotions', form.querySelector('input[name="drinks_promotions"]').checked ? "Yes" : "No");
-      data.set('new_beer_alerts', form.querySelector('input[name="new_beer_alerts"]').checked ? "Yes" : "No");
+    // collect data
+    const data = new FormData(form);
+    data.set('music', form.querySelector('input[name="music"]').checked ? "Yes" : "No");
+    data.set('vinyl_night', form.querySelector('input[name="vinyl_night"]').checked ? "Yes" : "No");
+    data.set('quiz', form.querySelector('input[name="quiz"]').checked ? "Yes" : "No");
+    data.set('drinks_promotions', form.querySelector('input[name="drinks_promotions"]').checked ? "Yes" : "No");
+    data.set('new_beer_alerts', form.querySelector('input[name="new_beer_alerts"]').checked ? "Yes" : "No");
 
-      const formData = Object.fromEntries(data.entries());
+    const formData = Object.fromEntries(data.entries());
 
-https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec      try {
-        await fetch(scriptURL, {
-          method: 'POST',
-          body: new URLSearchParams(formData)
-        });
+    try {
+      const response = await fetch(scriptURL, {
+        method: 'POST',
+        body: new URLSearchParams(formData)
+      });
+
+      const text = await response.text();
+
+      if(text === 'DUPLICATE') {
+        successMessage.style.color = 'red';
+        successMessage.textContent = 'You have already signed up.';
+      } else if(text === 'SUCCESS') {
         form.reset();
+        successMessage.style.color = 'green';
         successMessage.textContent = 'Thanks for signing up!';
-      } catch (error) {
-        successMessage.textContent = 'There was an error. Please try again later.';
+      } else {
+        successMessage.style.color = 'red';
+        successMessage.textContent = 'There was an unexpected response. Please try again later.';
       }
-    });
-  </script>
+    } catch (error) {
+      successMessage.style.color = 'red';
+      successMessage.textContent = 'There was an error. Please try again later.';
+    }
+  });
+</script>
+
 </body>
 </html>
