@@ -53,7 +53,7 @@
   </style>
 </head>
 <body>
-  <h1>Sign up & get a free drink on your birthday!</h1>
+  <h1>Join The Hopper's Hut List</h1>
   <form id="signup-form">
     <label for="name">First Name:</label>
     <input type="text" id="name" name="name" required />
@@ -88,42 +88,33 @@
   </form>
 
   <script>
-  const form = document.getElementById('signup-form');
-  const successMessage = document.getElementById('success-message');
+    const form = document.getElementById('signup-form');
+    const successMessage = document.getElementById('success-message');
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-    const data = new FormData(form);
-    data.set('music', form.querySelector('input[name="music"]').checked ? "Yes" : "No");
-    data.set('vinyl_night', form.querySelector('input[name="vinyl_night"]').checked ? "Yes" : "No");
-    data.set('quiz', form.querySelector('input[name="quiz"]').checked ? "Yes" : "No");
-    data.set('drinks_promotions', form.querySelector('input[name="drinks_promotions"]').checked ? "Yes" : "No");
-    data.set('new_beer_alerts', form.querySelector('input[name="new_beer_alerts"]').checked ? "Yes" : "No");
+      const data = new FormData(form);
+      data.set('music', form.querySelector('input[name="music"]').checked ? "Yes" : "No");
+      data.set('vinyl_night', form.querySelector('input[name="vinyl_night"]').checked ? "Yes" : "No");
+      data.set('quiz', form.querySelector('input[name="quiz"]').checked ? "Yes" : "No");
+      data.set('drinks_promotions', form.querySelector('input[name="drinks_promotions"]').checked ? "Yes" : "No");
+      data.set('new_beer_alerts', form.querySelector('input[name="new_beer_alerts"]').checked ? "Yes" : "No");
 
-    const formData = Object.fromEntries(data.entries());
-https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec
-    fetch(scriptURL, {
-      method: 'POST',
-      body: new URLSearchParams(formData)
-    })
-      .then(response => response.text())
-      .then(result => {
-        if (result.trim() === "DUPLICATE") {
-          successMessage.textContent = 'You have already signed up.';
-        } else if (result.trim() === "SUCCESS") {
-          form.reset();
-          successMessage.textContent = 'Thanks for signing up!';
-        } else {
-          successMessage.textContent = 'There was an unexpected response. Please try again later.';
-        }
-      })
-      .catch(error => {
-        console.error('Error!', error.message);
+      const formData = Object.fromEntries(data.entries());
+
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbyTTOIb55A0CG0zltjKqj5qrMSghXtivkjZKIBnuJG3IUM_5p6AjoM5a_FL8oiofbmksA/exec';
+      try {
+        await fetch(scriptURL, {
+          method: 'POST',
+          body: new URLSearchParams(formData)
+        });
+        form.reset();
+        successMessage.textContent = 'Thanks for signing up!';
+      } catch (error) {
         successMessage.textContent = 'There was an error. Please try again later.';
-      });
-  });
-</script>
-
+      }
+    });
+  </script>
 </body>
 </html>
